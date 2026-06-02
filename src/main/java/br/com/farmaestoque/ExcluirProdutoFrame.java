@@ -79,17 +79,9 @@ public class ExcluirProdutoFrame extends JFrame {
             return;
         }
 
-        // (opcional) exige perfil ADMIN
-        try {
-            java.lang.reflect.Method m = usuarioLogado.getClass().getMethod("getPerfil");
-            Object perfil = m.invoke(usuarioLogado);
-            if (perfil == null || !"ADMIN".equalsIgnoreCase(perfil.toString())) {
-                JOptionPane.showMessageDialog(this, "Apenas administradores podem excluir produtos.");
-                return;
-            }
-        } catch (NoSuchMethodException ignore) {
-        } catch (Exception ex) {
-            ex.printStackTrace();
+        if (!usuarioLogado.isAdmin()) {
+            JOptionPane.showMessageDialog(this, "Apenas administradores podem excluir produtos.");
+            return;
         }
 
         // 2) confirma senha do usuário logado (SHA-256)
@@ -111,14 +103,6 @@ public class ExcluirProdutoFrame extends JFrame {
             return;
         }
         String hashBanco = usuarioBanco.getSenha();
-
-        // DEBUG opcional
-        String shaCalc = SegurancaUtil.sha256Hex(senhaDigitada);
-        System.out.println("Auth(prod) -> login=" + usuarioBanco.getLogin()
-                + ", hashLen=" + (hashBanco == null ? 0 : hashBanco.length())
-                + ", hashPrefix=" + (hashBanco == null ? "<null>" :
-                    (hashBanco.length() >= 7 ? hashBanco.substring(0, 7) : hashBanco)));
-        System.out.println("Auth(prod) calc -> shaCalc=" + shaCalc);
 
         if (!SegurancaUtil.verificarSenha(senhaDigitada, hashBanco)) {
             JOptionPane.showMessageDialog(this, "Senha incorreta. Exclusão não permitida.");

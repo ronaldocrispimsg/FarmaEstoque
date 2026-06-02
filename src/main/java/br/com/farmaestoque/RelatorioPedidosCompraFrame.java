@@ -186,18 +186,9 @@ public class RelatorioPedidosCompraFrame extends JFrame {
             return;
         }
 
-        // (opcional) valida perfil ADMIN, se existir getPerfil()
-        try {
-            java.lang.reflect.Method m = logado.getClass().getMethod("getPerfil");
-            Object perfil = m.invoke(logado);
-            if (perfil == null || !"ADMIN".equalsIgnoreCase(perfil.toString())) {
-                JOptionPane.showMessageDialog(this, "Apenas administradores podem limpar o histórico.");
-                return;
-            }
-        } catch (NoSuchMethodException ignore) {
-            // sem campo de perfil, ignora
-        } catch (Exception ex) {
-            ex.printStackTrace();
+        if (!logado.isAdmin()) {
+            JOptionPane.showMessageDialog(this, "Apenas administradores podem limpar o histórico.");
+            return;
         }
 
         // 2) prompt de senha mostrando quem confirma
@@ -220,14 +211,6 @@ public class RelatorioPedidosCompraFrame extends JFrame {
             return;
         }
         String hashBanco = usuarioBanco.getSenha();
-
-        // DEBUG opcional
-        String shaCalc = SegurancaUtil.sha256Hex(senhaDigitada);
-        System.out.println("Auth(pedidos) -> login=" + usuarioBanco.getLogin()
-                + ", hashLen=" + (hashBanco == null ? 0 : hashBanco.length())
-                + ", hashPrefix=" + (hashBanco == null ? "<null>" :
-                    (hashBanco.length() >= 7 ? hashBanco.substring(0, 7) : hashBanco)));
-        System.out.println("Auth(pedidos) calc -> shaCalc=" + shaCalc);
 
         // 4) valida senha (SHA-256 hex)
         boolean ok = SegurancaUtil.verificarSenha(senhaDigitada, hashBanco);

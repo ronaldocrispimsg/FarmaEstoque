@@ -20,11 +20,7 @@ public class PedidoCompraService {
     }
 
     public static void limparPedidos() {
-        try (Session session = HibernateUtil.getSessionFactory().openSession()) {
-            session.beginTransaction();
-            session.createQuery("DELETE FROM PedidoCompra").executeUpdate();
-            session.getTransaction().commit();
-        }
+        limparHistorico();
     }
 
     public static List<PedidoCompra> buscarPedidosPorData(LocalDate data) {
@@ -39,14 +35,14 @@ public class PedidoCompraService {
     }
     
     public static void limparHistorico() {
-    try (Session session = HibernateUtil.getSessionFactory().openSession()) {
-        session.beginTransaction();
-        session.createQuery("DELETE FROM PedidoCompra").executeUpdate();
-        session.getTransaction().commit();
-    } catch (Exception e) {
-        e.printStackTrace();
+        try (Session session = HibernateUtil.getSessionFactory().openSession()) {
+            session.beginTransaction();
+            session.createQuery("DELETE FROM PedidoCompra").executeUpdate();
+            session.getTransaction().commit();
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
     }
-}
 
 }
     

@@ -80,7 +80,7 @@ public class CadastroUsuarioFrame extends JFrame {
 
             // salva
             Transaction tx = session.beginTransaction();
-            Usuario novoUsuario = new Usuario(login, senhaHash); // Usuario(login, senhaHash)
+            Usuario novoUsuario = new Usuario(login, senhaHash, Usuario.PERFIL_USUARIO);
             session.save(novoUsuario);
             tx.commit();
 

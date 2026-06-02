@@ -48,17 +48,9 @@ public class ExcluirFornecedorFrame extends JFrame {
             return;
         }
 
-        // (opcional) valida perfil ADMIN se houver getPerfil()
-        try {
-            java.lang.reflect.Method m = usuarioLogado.getClass().getMethod("getPerfil");
-            Object perfil = m.invoke(usuarioLogado);
-            if (perfil == null || !"ADMIN".equalsIgnoreCase(perfil.toString())) {
-                JOptionPane.showMessageDialog(this, "Apenas administradores podem excluir fornecedores.");
-                return;
-            }
-        } catch (NoSuchMethodException ignore) {
-        } catch (Exception ex) {
-            ex.printStackTrace();
+        if (!usuarioLogado.isAdmin()) {
+            JOptionPane.showMessageDialog(this, "Apenas administradores podem excluir fornecedores.");
+            return;
         }
 
         Fornecedor fornecedor = selecionarFornecedor(FornecedorService.buscarFornecedoresPorTermo(termoFornecedor));
@@ -96,15 +88,7 @@ public class ExcluirFornecedorFrame extends JFrame {
             return;
         }
 
-        String hashBanco = usuarioParaValidar.getSenha(); // coluna senhaHash
-        // debug útil
-        String shaCalc = SegurancaUtil.sha256Hex(senhaDigitada);
-        System.out.println("Auth debug -> login=" + usuarioParaValidar.getLogin()
-                + ", hashLen=" + (hashBanco == null ? 0 : hashBanco.length())
-                + ", hashPrefix=" + (hashBanco == null ? "<null>" :
-                    (hashBanco.length() >= 7 ? hashBanco.substring(0,7) : hashBanco))
-        );
-        System.out.println("Auth calc  -> shaCalc=" + shaCalc + " (len=" + shaCalc.length() + ")");
+        String hashBanco = usuarioParaValidar.getSenha();
 
         boolean ok = SegurancaUtil.verificarSenha(senhaDigitada, hashBanco);
         if (!ok) {

@@ -15,8 +15,8 @@ USE farmaestoque;
 CREATE TABLE IF NOT EXISTS usuarios (
   id        INT AUTO_INCREMENT PRIMARY KEY,
   login     VARCHAR(50)  NOT NULL UNIQUE,
-  nome      VARCHAR(100) NOT NULL,
-  perfil    VARCHAR(20)  NOT NULL DEFAULT 'ADMIN',
+  nome      VARCHAR(100),
+  perfil    VARCHAR(20)  NOT NULL DEFAULT 'USUARIO',
   senhaHash VARCHAR(64)  CHARACTER SET ascii COLLATE ascii_general_ci NOT NULL
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;
 
