@@ -12,8 +12,7 @@ FarmaEstoque e um sistema desktop em Java para gestao de estoque farmaceutico. A
 - OpenPDF/iText
 
 ## Como executar
-Execute a classe principal:
-Atraves do NetBeans
+Execute a classe principal atraves do NetBeans
 
 Classe principal:
 
