@@ -1,6 +1,6 @@
-target/
-*.class
-*.log
+#target/
+#*.class
+#*.log
 .vscode/
-.idea/
-*.iml
+#.idea/
+#*.iml
