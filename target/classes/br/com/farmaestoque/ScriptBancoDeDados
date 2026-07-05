@@ -1,0 +1,95 @@
+-- ============================================================
+-- FarmaEstoque - Script de Banco de Dados
+-- Sistema de Gerenciamento de Estoque Farmacêutico
+-- ============================================================
+-- ATENÇÃO: Configure usuário e senha do MySQL como root
+
+-- 1) Criar banco de dados
+CREATE DATABASE IF NOT EXISTS farmaestoque
+  DEFAULT CHARACTER SET utf8mb4
+  COLLATE utf8mb4_0900_ai_ci;
+
+USE farmaestoque;
+
+-- 2) USUÁRIOS
+CREATE TABLE IF NOT EXISTS usuarios (
+  id        INT AUTO_INCREMENT PRIMARY KEY,
+  login     VARCHAR(50)  NOT NULL UNIQUE,
+  nome      VARCHAR(100) NOT NULL,
+  perfil    VARCHAR(20)  NOT NULL DEFAULT 'USUARIO',
+  senhaHash VARCHAR(64)  CHARACTER SET ascii COLLATE ascii_general_ci NOT NULL
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;
+
+-- 3) FORNECEDORES
+CREATE TABLE IF NOT EXISTS fornecedores (
+  id           INT AUTO_INCREMENT PRIMARY KEY,
+  segmento     VARCHAR(100) NOT NULL,
+  razaoSocial  VARCHAR(100) NOT NULL,
+  anoCadastro  INT          NOT NULL,
+  ativo        TINYINT(1)   NOT NULL DEFAULT 1,
+  responsavel  VARCHAR(100) NOT NULL,
+  cnpj         VARCHAR(20)  NOT NULL UNIQUE
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;
+
+-- 4) MEDICAMENTOS
+CREATE TABLE IF NOT EXISTS `Medicamento` (
+  id                  INT AUTO_INCREMENT PRIMARY KEY,
+  ativo               TINYINT(1)    NOT NULL DEFAULT 1,
+  descricao           VARCHAR(255),        -- dosagem/apresentação
+  marca               VARCHAR(100)  NOT NULL, -- fabricante
+  nome                VARCHAR(150)  NOT NULL, -- nome do medicamento
+  preco               DECIMAL(10,2) NOT NULL,
+  quantidade          INT           NOT NULL DEFAULT 0,
+  principioAtivo      VARCHAR(255)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;
+
+-- 5) PEDIDOS DE COMPRA
+CREATE TABLE IF NOT EXISTS pedidos (
+  id            INT AUTO_INCREMENT PRIMARY KEY,
+  fornecedor_id INT          NOT NULL,
+  descricao     VARCHAR(255),
+  valor         DECIMAL(10,2) NOT NULL DEFAULT 0,
+  data          DATE,
+  numeroLote    INT          DEFAULT 0,
+  CONSTRAINT fk_ped_forn
+    FOREIGN KEY (fornecedor_id) REFERENCES fornecedores(id) ON DELETE CASCADE
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;
+
+-- 6) DISPENSAÇÕES (equivalente a "vendas")
+CREATE TABLE IF NOT EXISTS vendas (
+  id           INT AUTO_INCREMENT PRIMARY KEY,
+  produto_id   INT          NOT NULL,
+  quantidade   INT          NOT NULL,
+  comprador    VARCHAR(150),              -- farmácia/cliente destino
+  data_venda   DATETIME,
+  valor_total  DECIMAL(10,2) NOT NULL DEFAULT 0,
+  CONSTRAINT fk_disp_med
+    FOREIGN KEY (produto_id) REFERENCES `Medicamento`(id)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;
+
+-- ============================================================
+-- DADOS DE EXEMPLO
+-- ============================================================
+
+-- Medicamentos de exemplo
+INSERT INTO Medicamento (ativo, descricao, marca, nome, preco, quantidade, principioAtivo) VALUES
+  (1, 'Comprimido revestido 500mg - caixa com 20', 'EMS',       'Amoxicilina 500mg',      12.50, 200, 'Amoxicilina tri-hidratada'),
+  (1, 'Comprimido 20mg - caixa com 30',            'Eurofarma', 'Omeprazol 20mg',           8.90, 350, 'Omeprazol'),
+  (1, 'Solução oral 200mg/5ml - frasco 100ml',     'Medley',    'Ibuprofeno 200mg/5ml',    14.00, 120, 'Ibuprofeno'),
+  (1, 'Comprimido 10mg - caixa com 30',            'Torrent',   'Atorvastatina 10mg',      22.00,  80, 'Atorvastatina cálcica'),
+  (1, 'Comprimido 500mg - caixa com 20',           'Cimed',     'Metformina 500mg',         9.50, 450, 'Cloridrato de metformina');
+
+-- Fornecedores de exemplo
+INSERT INTO fornecedores (segmento, razaoSocial, anoCadastro, ativo, responsavel, cnpj) VALUES
+  ('Genérico',    'EMS S/A',              2018, 1, 'Carlos Fonseca',   '12.345.678/0001-99'),
+  ('Referência',  'Eurofarma Laboratórios', 2019, 1, 'Silvia Torres',  '23.456.789/0001-88'),
+  ('Genérico',    'Medley Farmacêutica',   2020, 1, 'Roberto Lima',    '34.567.890/0001-77'),
+  ('Genérico',    'Torrent do Brasil',     2021, 1, 'Fernanda Brito',  '45.678.901/0001-66');
+
+-- ============================================================
+-- CRIAR ADMINISTRADOR
+-- Gere o hash SHA-256 da sua senha e insira abaixo:
+-- SELECT SHA2('sua_senha_aqui', 256);
+-- ============================================================
+-- INSERT INTO usuarios (login, nome, perfil, senhaHash)
+-- VALUES ('admin', 'Administrador FarmaEstoque', 'ADMIN', 'HASH_AQUI');
